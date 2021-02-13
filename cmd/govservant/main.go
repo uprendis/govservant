@@ -65,7 +65,7 @@ func main() {
 	for {
 		handled, err := maintainGovTasks(key.Address, govAddress, signerFn, rpcUrl)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Governance maintainence error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "Governance maintainance error: %v\n", err)
 		}
 		fmt.Printf("Handled %d tasks\n", handled)
 		timer := time.NewTimer(30 * time.Second)
