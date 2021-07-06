@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -39,13 +40,15 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Private key reading error: %v\n", err)
 		return
 	}
-	auth, err := ioutil.ReadFile(passwordPath)
+	// read first line of the password file
+	authText, err := ioutil.ReadFile(passwordPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Password file reading error: %v\n", err)
 		return
 	}
+	auth := strings.Split(string(authText), "\n")[0]
 
-	key, err := keystore.DecryptKey(keyjson, string(auth))
+	key, err := keystore.DecryptKey(keyjson, auth)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Private key decrypting error: %v\n", err)
 		return
