@@ -11,7 +11,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 )
 
 func isHelp(args []string) bool {
@@ -54,10 +53,6 @@ func main() {
 		return
 	}
 
-	signerFn := func(s types.Signer, _ common.Address, tx *types.Transaction) (*types.Transaction, error) {
-		return types.SignTx(tx, s, key.PrivateKey)
-	}
-
 	// Governance maintenance
 
 	// Watch for Ctrl-C while the import is running.
@@ -66,7 +61,7 @@ func main() {
 	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM)
 	defer signal.Stop(interrupt)
 	for {
-		handled, err := maintainGovTasks(key.Address, govAddress, signerFn, rpcUrl)
+		handled, err := maintainGovTasks(key.Address, govAddress, key, rpcUrl)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Governance maintainance error: %v\n", err)
 		}

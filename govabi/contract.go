@@ -137,7 +137,7 @@ func bindContract(address common.Address, caller bind.ContractCaller, transactor
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_Contract *ContractRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+func (_Contract *ContractRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
 	return _Contract.Contract.ContractCaller.contract.Call(opts, result, method, params...)
 }
 
@@ -156,7 +156,7 @@ func (_Contract *ContractRaw) Transact(opts *bind.TransactOpts, method string, p
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_Contract *ContractCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+func (_Contract *ContractCallerRaw) Call(opts *bind.CallOpts, result *[]interface{}, method string, params ...interface{}) error {
 	return _Contract.Contract.contract.Call(opts, result, method, params...)
 }
 
@@ -175,12 +175,17 @@ func (_Contract *ContractTransactorRaw) Transact(opts *bind.TransactOpts, method
 //
 // Solidity: function bytes32ToString(bytes32 _bytes32) pure returns(string)
 func (_Contract *ContractCaller) Bytes32ToString(opts *bind.CallOpts, _bytes32 [32]byte) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "bytes32ToString", _bytes32)
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "bytes32ToString", _bytes32)
+
+	if err != nil {
+		return *new(string), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(string)).(*string)
+
+	return out0, err
+
 }
 
 // Bytes32ToString is a free data retrieval call binding the contract method 0x9201de55.
@@ -205,14 +210,24 @@ func (_Contract *ContractCaller) CalculateVotingTally(opts *bind.CallOpts, propo
 	WinnerID         *big.Int
 	Votes            *big.Int
 }, error) {
-	ret := new(struct {
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "calculateVotingTally", proposalID)
+
+	outstruct := new(struct {
 		ProposalResolved bool
 		WinnerID         *big.Int
 		Votes            *big.Int
 	})
-	out := ret
-	err := _Contract.contract.Call(opts, out, "calculateVotingTally", proposalID)
-	return *ret, err
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.ProposalResolved = *abi.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.WinnerID = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.Votes = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+
+	return *outstruct, err
+
 }
 
 // CalculateVotingTally is a free data retrieval call binding the contract method 0x14262d79.
@@ -245,14 +260,24 @@ func (_Contract *ContractCaller) GetTask(opts *bind.CallOpts, i *big.Int) (struc
 	Assignment *big.Int
 	ProposalID *big.Int
 }, error) {
-	ret := new(struct {
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "getTask", i)
+
+	outstruct := new(struct {
 		Active     bool
 		Assignment *big.Int
 		ProposalID *big.Int
 	})
-	out := ret
-	err := _Contract.contract.Call(opts, out, "getTask", i)
-	return *ret, err
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.Active = *abi.ConvertType(out[0], new(bool)).(*bool)
+	outstruct.Assignment = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.ProposalID = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+
+	return *outstruct, err
+
 }
 
 // GetTask is a free data retrieval call binding the contract method 0x1d65e77e.
@@ -284,13 +309,22 @@ func (_Contract *ContractCaller) GetVote(opts *bind.CallOpts, from common.Addres
 	Weight  *big.Int
 	Choices []*big.Int
 }, error) {
-	ret := new(struct {
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "getVote", from, delegatedTo, proposalID)
+
+	outstruct := new(struct {
 		Weight  *big.Int
 		Choices []*big.Int
 	})
-	out := ret
-	err := _Contract.contract.Call(opts, out, "getVote", from, delegatedTo, proposalID)
-	return *ret, err
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.Weight = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.Choices = *abi.ConvertType(out[1], new([]*big.Int)).(*[]*big.Int)
+
+	return *outstruct, err
+
 }
 
 // GetVote is a free data retrieval call binding the contract method 0xb9e6842b.
@@ -317,12 +351,17 @@ func (_Contract *ContractCallerSession) GetVote(from common.Address, delegatedTo
 //
 // Solidity: function lastProposalID() view returns(uint256)
 func (_Contract *ContractCaller) LastProposalID(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "lastProposalID")
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "lastProposalID")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
 }
 
 // LastProposalID is a free data retrieval call binding the contract method 0xa1d373d7.
@@ -343,12 +382,17 @@ func (_Contract *ContractCallerSession) LastProposalID() (*big.Int, error) {
 //
 // Solidity: function maxExecutionPeriod() pure returns(uint256)
 func (_Contract *ContractCaller) MaxExecutionPeriod(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "maxExecutionPeriod")
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "maxExecutionPeriod")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
 }
 
 // MaxExecutionPeriod is a free data retrieval call binding the contract method 0xc25c2f26.
@@ -369,12 +413,17 @@ func (_Contract *ContractCallerSession) MaxExecutionPeriod() (*big.Int, error) {
 //
 // Solidity: function maxOptions() pure returns(uint256)
 func (_Contract *ContractCaller) MaxOptions(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "maxOptions")
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "maxOptions")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
 }
 
 // MaxOptions is a free data retrieval call binding the contract method 0x5df17077.
@@ -395,12 +444,17 @@ func (_Contract *ContractCallerSession) MaxOptions() (*big.Int, error) {
 //
 // Solidity: function minVotesAbsolute(uint256 totalWeight, uint256 minVotesRatio) pure returns(uint256)
 func (_Contract *ContractCaller) MinVotesAbsolute(opts *bind.CallOpts, totalWeight *big.Int, minVotesRatio *big.Int) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "minVotesAbsolute", totalWeight, minVotesRatio)
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "minVotesAbsolute", totalWeight, minVotesRatio)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
 }
 
 // MinVotesAbsolute is a free data retrieval call binding the contract method 0x1191e270.
@@ -421,12 +475,17 @@ func (_Contract *ContractCallerSession) MinVotesAbsolute(totalWeight *big.Int, m
 //
 // Solidity: function overriddenWeight(address , uint256 ) view returns(uint256)
 func (_Contract *ContractCaller) OverriddenWeight(opts *bind.CallOpts, arg0 common.Address, arg1 *big.Int) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "overriddenWeight", arg0, arg1)
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "overriddenWeight", arg0, arg1)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
 }
 
 // OverriddenWeight is a free data retrieval call binding the contract method 0x2177d6fc.
@@ -447,12 +506,17 @@ func (_Contract *ContractCallerSession) OverriddenWeight(arg0 common.Address, ar
 //
 // Solidity: function proposalBurntFee() pure returns(uint256)
 func (_Contract *ContractCaller) ProposalBurntFee(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "proposalBurntFee")
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "proposalBurntFee")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
 }
 
 // ProposalBurntFee is a free data retrieval call binding the contract method 0x8a444bd7.
@@ -473,12 +537,17 @@ func (_Contract *ContractCallerSession) ProposalBurntFee() (*big.Int, error) {
 //
 // Solidity: function proposalFee() pure returns(uint256)
 func (_Contract *ContractCaller) ProposalFee(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "proposalFee")
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "proposalFee")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
 }
 
 // ProposalFee is a free data retrieval call binding the contract method 0xc27cabb5.
@@ -503,14 +572,24 @@ func (_Contract *ContractCaller) ProposalOptionState(opts *bind.CallOpts, propos
 	AgreementRatio *big.Int
 	Agreement      *big.Int
 }, error) {
-	ret := new(struct {
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "proposalOptionState", proposalID, optionID)
+
+	outstruct := new(struct {
 		Votes          *big.Int
 		AgreementRatio *big.Int
 		Agreement      *big.Int
 	})
-	out := ret
-	err := _Contract.contract.Call(opts, out, "proposalOptionState", proposalID, optionID)
-	return *ret, err
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.Votes = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.AgreementRatio = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.Agreement = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+
+	return *outstruct, err
+
 }
 
 // ProposalOptionState is a free data retrieval call binding the contract method 0x5f89801e.
@@ -550,7 +629,10 @@ func (_Contract *ContractCaller) ProposalParams(opts *bind.CallOpts, proposalID 
 	VotingMinEndTime *big.Int
 	VotingMaxEndTime *big.Int
 }, error) {
-	ret := new(struct {
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "proposalParams", proposalID)
+
+	outstruct := new(struct {
 		PType            *big.Int
 		Executable       uint8
 		MinVotes         *big.Int
@@ -562,9 +644,23 @@ func (_Contract *ContractCaller) ProposalParams(opts *bind.CallOpts, proposalID 
 		VotingMinEndTime *big.Int
 		VotingMaxEndTime *big.Int
 	})
-	out := ret
-	err := _Contract.contract.Call(opts, out, "proposalParams", proposalID)
-	return *ret, err
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.PType = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.Executable = *abi.ConvertType(out[1], new(uint8)).(*uint8)
+	outstruct.MinVotes = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+	outstruct.MinAgreement = *abi.ConvertType(out[3], new(*big.Int)).(**big.Int)
+	outstruct.OpinionScales = *abi.ConvertType(out[4], new([]*big.Int)).(*[]*big.Int)
+	outstruct.Options = *abi.ConvertType(out[5], new([][32]byte)).(*[][32]byte)
+	outstruct.ProposalContract = *abi.ConvertType(out[6], new(common.Address)).(*common.Address)
+	outstruct.VotingStartTime = *abi.ConvertType(out[7], new(*big.Int)).(**big.Int)
+	outstruct.VotingMinEndTime = *abi.ConvertType(out[8], new(*big.Int)).(**big.Int)
+	outstruct.VotingMaxEndTime = *abi.ConvertType(out[9], new(*big.Int)).(**big.Int)
+
+	return *outstruct, err
+
 }
 
 // ProposalParams is a free data retrieval call binding the contract method 0xcfa1afa3.
@@ -611,14 +707,24 @@ func (_Contract *ContractCaller) ProposalState(opts *bind.CallOpts, proposalID *
 	Votes          *big.Int
 	Status         *big.Int
 }, error) {
-	ret := new(struct {
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "proposalState", proposalID)
+
+	outstruct := new(struct {
 		WinnerOptionID *big.Int
 		Votes          *big.Int
 		Status         *big.Int
 	})
-	out := ret
-	err := _Contract.contract.Call(opts, out, "proposalState", proposalID)
-	return *ret, err
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.WinnerOptionID = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.Votes = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.Status = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+
+	return *outstruct, err
+
 }
 
 // ProposalState is a free data retrieval call binding the contract method 0xd26331d4.
@@ -647,12 +753,17 @@ func (_Contract *ContractCallerSession) ProposalState(proposalID *big.Int) (stru
 //
 // Solidity: function taskErasingReward() pure returns(uint256)
 func (_Contract *ContractCaller) TaskErasingReward(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "taskErasingReward")
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "taskErasingReward")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
 }
 
 // TaskErasingReward is a free data retrieval call binding the contract method 0xaea2ddbd.
@@ -673,12 +784,17 @@ func (_Contract *ContractCallerSession) TaskErasingReward() (*big.Int, error) {
 //
 // Solidity: function taskHandlingReward() pure returns(uint256)
 func (_Contract *ContractCaller) TaskHandlingReward(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "taskHandlingReward")
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "taskHandlingReward")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
 }
 
 // TaskHandlingReward is a free data retrieval call binding the contract method 0xe3a4d709.
@@ -699,12 +815,17 @@ func (_Contract *ContractCallerSession) TaskHandlingReward() (*big.Int, error) {
 //
 // Solidity: function tasksCount() view returns(uint256)
 func (_Contract *ContractCaller) TasksCount(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "tasksCount")
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "tasksCount")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
 }
 
 // TasksCount is a free data retrieval call binding the contract method 0xbb6a0f07.
@@ -725,12 +846,17 @@ func (_Contract *ContractCallerSession) TasksCount() (*big.Int, error) {
 //
 // Solidity: function version() pure returns(bytes4)
 func (_Contract *ContractCaller) Version(opts *bind.CallOpts) ([4]byte, error) {
-	var (
-		ret0 = new([4]byte)
-	)
-	out := ret0
-	err := _Contract.contract.Call(opts, out, "version")
-	return *ret0, err
+	var out []interface{}
+	err := _Contract.contract.Call(opts, &out, "version")
+
+	if err != nil {
+		return *new([4]byte), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new([4]byte)).(*[4]byte)
+
+	return out0, err
+
 }
 
 // Version is a free data retrieval call binding the contract method 0x54fd4d50.
@@ -1045,6 +1171,7 @@ func (_Contract *ContractFilterer) ParseProposalCanceled(log types.Log) (*Contra
 	if err := _Contract.contract.UnpackLog(event, "ProposalCanceled", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }
 
@@ -1178,6 +1305,7 @@ func (_Contract *ContractFilterer) ParseProposalCreated(log types.Log) (*Contrac
 	if err := _Contract.contract.UnpackLog(event, "ProposalCreated", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }
 
@@ -1311,6 +1439,7 @@ func (_Contract *ContractFilterer) ParseProposalExecutionExpired(log types.Log) 
 	if err := _Contract.contract.UnpackLog(event, "ProposalExecutionExpired", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }
 
@@ -1444,6 +1573,7 @@ func (_Contract *ContractFilterer) ParseProposalRejected(log types.Log) (*Contra
 	if err := _Contract.contract.UnpackLog(event, "ProposalRejected", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }
 
@@ -1577,6 +1707,7 @@ func (_Contract *ContractFilterer) ParseProposalResolved(log types.Log) (*Contra
 	if err := _Contract.contract.UnpackLog(event, "ProposalResolved", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }
 
@@ -1710,6 +1841,7 @@ func (_Contract *ContractFilterer) ParseTasksErased(log types.Log) (*ContractTas
 	if err := _Contract.contract.UnpackLog(event, "TasksErased", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }
 
@@ -1845,6 +1977,7 @@ func (_Contract *ContractFilterer) ParseTasksHandled(log types.Log) (*ContractTa
 	if err := _Contract.contract.UnpackLog(event, "TasksHandled", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }
 
@@ -1980,6 +2113,7 @@ func (_Contract *ContractFilterer) ParseVoteCanceled(log types.Log) (*ContractVo
 	if err := _Contract.contract.UnpackLog(event, "VoteCanceled", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }
 
@@ -2114,6 +2248,7 @@ func (_Contract *ContractFilterer) ParseVoteWeightOverridden(log types.Log) (*Co
 	if err := _Contract.contract.UnpackLog(event, "VoteWeightOverridden", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }
 
@@ -2248,6 +2383,7 @@ func (_Contract *ContractFilterer) ParseVoteWeightUnOverridden(log types.Log) (*
 	if err := _Contract.contract.UnpackLog(event, "VoteWeightUnOverridden", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }
 
@@ -2385,5 +2521,6 @@ func (_Contract *ContractFilterer) ParseVoted(log types.Log) (*ContractVoted, er
 	if err := _Contract.contract.UnpackLog(event, "Voted", log); err != nil {
 		return nil, err
 	}
+	event.Raw = log
 	return event, nil
 }

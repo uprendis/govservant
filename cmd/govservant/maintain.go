@@ -6,14 +6,16 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/uprendis/govservant/govabi"
 )
 
-func maintainGovTasks(sender, govAddr common.Address, signer bind.SignerFn, rpcUrl string) (handled uint64, err error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5 * time.Minute)
+func maintainGovTasks(sender, govAddr common.Address, key *keystore.Key, rpcUrl string) (handled uint64, err error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Minute)
 	defer cancel()
 	client, err := ethclient.DialContext(ctx, rpcUrl)
 	if err != nil {
@@ -23,6 +25,14 @@ func maintainGovTasks(sender, govAddr common.Address, signer bind.SignerFn, rpcU
 	nonce, err := client.NonceAt(ctx, sender, nil)
 	if err != nil {
 		return handled, err
+	}
+	chainID, err := client.ChainID(ctx)
+	if err != nil {
+		return handled, err
+	}
+
+	signerFn := func(_ common.Address, tx *types.Transaction) (*types.Transaction, error) {
+		return types.SignTx(tx, types.LatestSignerForChainID(chainID), key.PrivateKey)
 	}
 
 	gov, err := govabi.NewContract(govAddr, client)
@@ -35,7 +45,7 @@ func maintainGovTasks(sender, govAddr common.Address, signer bind.SignerFn, rpcU
 	}
 	transactOpts := &bind.TransactOpts{
 		From:    sender,
-		Signer:  signer,
+		Signer:  signerFn,
 		Nonce:   new(big.Int).SetUint64(nonce),
 		Context: ctx,
 	}
